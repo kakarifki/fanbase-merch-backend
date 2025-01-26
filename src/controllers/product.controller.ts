@@ -3,13 +3,9 @@ import prisma from "../db/prisma";
 import { CreateProductInput, createProductSchema } from "../schemas/product.schema";
 import productRoutes from "../routes/product.routes";
 
-export const getProductByCode = async (c: Context) => {
+export const getProductByCode = async ( c ) => {
     const code = c.req.param();
-    const product = await prisma.product.findUnique(
-        {
-            where: {code}
-        }
-    );
+    const product = await prisma.product.findUnique({ where: code });
 
     if (!product) {
         return c.json(
