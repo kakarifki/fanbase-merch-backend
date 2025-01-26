@@ -4,6 +4,7 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.2.1",
     "@types/node": "^22.10.10",
     "hono": "^4.6.18",
     "prisma": "^6.2.1",
