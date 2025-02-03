@@ -29,10 +29,10 @@ model Product {
   id          String    @id @default(uuid())
   code        String    @unique // Kode unik (secondary key)
   name        String
-  description String
+  description String?   // Opsional
   price       Float
-  imageUrl    String
-  fanbase     String
+  imageUrl    String?   // Opsional
+  fanbase     String?   // Opsional
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   carts       Cart[]    // Relasi ke Cart
