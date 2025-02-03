@@ -1,7 +1,9 @@
 {
-  "name": "my-app",
+  "name": "fanbase-merch-backend",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "prestart": "bunx prisma migrate deploy",
+    "start": "bun run src/index.ts"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.18.3",
