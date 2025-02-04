@@ -17,6 +17,12 @@ const createProductSchema = z.object({
 
 type CreateProductInput = z.infer<typeof createProductSchema>;
 
+// GET /products
+productRoutes.get('/', async (c) => {
+  const products = await prisma.product.findMany();
+  return c.json(products);
+});
+
 // GET /products/:code
 productRoutes.get('/:code', async (c) => {
   const { code } = c.req.param();
