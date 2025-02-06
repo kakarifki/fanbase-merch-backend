@@ -8,7 +8,19 @@ import prisma from './db/prisma';
 const app = new Hono()
 
 
-app.use('*', cors());
+
+// betterAuth recomen
+app.use(
+	"/api/auth/**", // or replace with "*" to enable cors for all routes
+	cors({
+		origin: "http://localhost:5173", // replace with your origin
+		allowHeaders: ["Content-Type", "Authorization"],
+		allowMethods: ["POST", "GET", "OPTIONS"],
+		exposeHeaders: ["Content-Length"],
+		maxAge: 600,
+		credentials: true,
+	}),
+);
 
 // // Dummy handler untuk pengujian
 // app.post('/api/auth/dummy-register', async (c) => {
