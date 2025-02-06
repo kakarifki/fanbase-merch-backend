@@ -9,6 +9,7 @@
     "@hono/zod-openapi": "^0.18.3",
     "@prisma/client": "^6.2.1",
     "@types/node": "^22.10.10",
+    "better-auth": "^1.1.15",
     "hono": "^4.6.18",
     "prisma": "^6.2.1",
     "tsx": "^4.19.2",
