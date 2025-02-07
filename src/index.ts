@@ -13,7 +13,7 @@ const app = new Hono()
 app.use(
 	"/api/auth/**", // or replace with "*" to enable cors for all routes
 	cors({
-		origin: "http://localhost:5173", // replace with your origin
+		origin: "https://fanbase-merch.vercel.app/", // replace with your origin
 		allowHeaders: ["Content-Type", "Authorization"],
 		allowMethods: ["POST", "GET", "OPTIONS"],
 		exposeHeaders: ["Content-Length"],
