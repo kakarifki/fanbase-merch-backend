@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import productRoutes from './routes/product.routes'
+import authRoutes from './routes/auth.routes';
 import { cors } from 'hono/cors';
 // import { serve } from '@hono/node-server'
 
@@ -14,5 +15,6 @@ app.get('/', (c) => {
 })
 
 app.route('/products', productRoutes)
+app.route('/auth', authRoutes);
 
 export default app
