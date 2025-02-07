@@ -3,53 +3,45 @@
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // Gunakan environment variable untuk URL database
 }
 
 model User {
-  id            String    @id @default(uuid())
-  username      String    @unique
-  email         String    @unique
-  password      String
-  role          String    @default("USER") // Role: USER atau ADMIN
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  carts         Cart[] // Relasi ke Cart
-  orders        Order[] // Relasi ke Order
-  name          String
-  emailVerified Boolean
-  image         String?
-  sessions      Session[]
-  accounts      Account[]
-
-  @@map("user")
+  id        String    @id @default(uuid())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  role      String    @default("USER") // Role: USER atau ADMIN
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  carts     Cart[]    // Relasi ke Cart
+  orders    Order[]   // Relasi ke Order
 }
 
 model Product {
-  id          String      @id @default(uuid())
+  id          String    @id @default(uuid())
   code        String      @unique // Kode unik (secondary key)
   name        String
-  description String? // Opsional
+  description String? // Opsional (bisa null)
   price       Float
-  imageUrl    String? // Opsional
-  fanbase     String? // Opsional
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  carts       Cart[] // Relasi ke Cart
+  imageUrl    String? // Opsional (bisa null)
+  fanbase     String? // Opsional (bisa null)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  carts       Cart[]    // Relasi ke Cart
   orderItems  OrderItem[] // Relasi ke OrderItem
 }
 
 model Cart {
   id        String   @id @default(uuid())
-  userId    String // Foreign key ke User
-  productId String // Foreign key ke Product
+  userId    String   // Foreign key ke User
+  productId String   // Foreign key ke Product
   quantity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -59,7 +51,7 @@ model Cart {
 
 model Order {
   id         String      @id @default(uuid())
-  userId     String // Foreign key ke User
+  userId     String      // Foreign key ke User
   totalPrice Float
   status     String      @default("PENDING") // Status: PENDING atau COMPLETED
   createdAt  DateTime    @default(now())
@@ -69,56 +61,11 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String // Foreign key ke Order
-  productId String // Foreign key ke Product
+  id        String   @id @default(uuid())
+  orderId   String   // Foreign key ke Order
+  productId String   // Foreign key ke Product
   quantity  Int
   price     Float
-  order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
-}
-
-model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([token])
-  @@map("session")
-}
-
-model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime
-  updatedAt             DateTime
-
-  @@map("account")
-}
-
-model Verification {
-  id         String    @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime?
-  updatedAt  DateTime?
-
-  @@map("verification")
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
