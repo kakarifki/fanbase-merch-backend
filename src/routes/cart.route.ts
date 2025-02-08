@@ -1,10 +1,15 @@
-// src/routes/cart.ts
 import { Hono } from 'hono';
 import { PrismaClient } from '@prisma/client';
 import { checkAuth } from '../middleware/auth';
+import { z } from 'zod'; // Import Zod untuk validasi
 
 const cartRoutes = new Hono();
 const prisma = new PrismaClient();
+
+// Skema Validasi untuk Request Body
+const addToCartSchema = z.object({
+  quantity: z.number().int().positive().default(1), // Quantity default 1
+});
 
 // GET /cart - Mendapatkan cart user yang sedang login
 cartRoutes.get('/', checkAuth, async (c) => {
@@ -40,6 +45,16 @@ cartRoutes.post('/:productId', checkAuth, async (c) => {
   const productId = c.req.param('productId');
 
   try {
+    // Validasi request body
+    const body = await c.req.json();
+    const validation = addToCartSchema.safeParse(body);
+
+    if (!validation.success) {
+      return c.json({ message: 'Invalid quantity', errors: validation.error }, 400);
+    }
+
+    const { quantity } = validation.data; // Dapatkan quantity dari body
+
     // Cek apakah product ada
     const product = await prisma.product.findUnique({
       where: {
@@ -67,7 +82,7 @@ cartRoutes.post('/:productId', checkAuth, async (c) => {
         },
         data: {
           quantity: {
-            increment: 1, // Bisa diubah sesuai kebutuhan (contoh: c.req.json() untuk mendapatkan quantity dari body)
+            increment: quantity, // Tambahkan quantity dari request body
           },
         },
       });
@@ -78,7 +93,7 @@ cartRoutes.post('/:productId', checkAuth, async (c) => {
         data: {
           userId: user.id,
           productId: productId,
-          quantity: 1, // Default quantity
+          quantity: quantity, // Gunakan quantity dari request body
         },
       });
       return c.json(newCartItem, 201);
