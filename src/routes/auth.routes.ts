@@ -18,7 +18,7 @@ authRoutes.post(
     try {
       // Hash password menggunakan Bun.password.hash
       const hashedPassword = await Bun.password.hash(body.password, {
-        algorithm: 'argon2id',
+        algorithm: 'argon2id', //sudah default, bisa delete
       });
 
       const newUser = await prisma.user.create({
