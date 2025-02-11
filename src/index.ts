@@ -8,9 +8,16 @@ import orderRoutes from './routes/order.routes';
 
 const app = new Hono()
 
+// Ambil origin frontend dari env
+const origin = process.env.ORIGIN || '';
 
-
-app.use('*', cors());
+// update cors 
+app.use(cors({
+  origin: origin, 
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}))
 
 app.get('/', (c) => {
   return c.text('Selamat datang di backend fanbase merch')
