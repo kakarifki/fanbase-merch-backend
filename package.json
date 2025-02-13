@@ -5,6 +5,9 @@
     "prestart": "bunx prisma migrate deploy",
     "start": "bun run src/index.ts"
   },
+  "prisma":{
+    "seed": "node ./prisma/seed.ts"
+  },
   "dependencies": {
     "@hono/zod-openapi": "^0.18.3",
     "@prisma/client": "^6.2.1",
@@ -18,4 +21,4 @@
   "devDependencies": {
     "@types/bun": "latest"
   }
-}
+} 
