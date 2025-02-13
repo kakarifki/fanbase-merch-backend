@@ -16,6 +16,11 @@ const addToCartSchema = z.object({
   path: ["productId", "code"], // Specify the path where the error occurs
 });
 
+// Skema Validasi untuk Delete Request Body
+const deleteCartSchema = z.object({
+  productId: z.string(),
+});
+
 // GET /cart - Mendapatkan cart user yang sedang login
 cartRoutes.get('/', checkAuth, async (c) => {
   const user = c.get('user');
@@ -117,16 +122,24 @@ cartRoutes.post('/items', checkAuth, async (c) => {
   }
 });
 
-// DELETE /cart/:productId - Menghapus product dari cart
-cartRoutes.delete('/:productId', checkAuth, async (c) => {
+// DELETE /cart/items - Menghapus product dari cart (menggunakan request body)
+cartRoutes.delete('/items', checkAuth, async (c) => {
   const user = c.get('user');
   if (!user) {
     return c.json({ message: 'Unauthorized' }, 401);
   }
 
-  const productId = c.req.param('productId');
-
   try {
+    // Validasi request body
+    const body = await c.req.json();
+    const validation = deleteCartSchema.safeParse(body);
+
+    if (!validation.success) {
+      return c.json({ message: 'Invalid request', errors: validation.error.issues, statusCode: 400 }, 400); // Mengembalikan error Zod
+    }
+
+    const { productId } = validation.data;
+
     // Cari cart item yang ingin dihapus
     const cartItemToDelete = await prisma.cart.findFirst({
       where: {
