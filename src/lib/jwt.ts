@@ -24,7 +24,7 @@ export const createJwt = async (userId: string): Promise<string> => {
         sub: {
             user_id: userId,
         },
-        exp: Math.floor(Date.now() / 1000) + 60 * 5, // 5 minutes
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // Durasi 1 hari
     };
 
     const token = await sign(payload, secret);
