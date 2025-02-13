@@ -1,13 +1,14 @@
 import { Hono } from 'hono';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { generateProductCode } from '../utils/generatecode';
 
 const prisma = new PrismaClient();
 const productRoutes = new Hono();
 
-// Schema validation
+// Schema validation (code jadi opsional)
 const createProductSchema = z.object({
-  code: z.string().min(3),
+  code: z.string().min(3).optional(), // Code tidak wajib diisi
   name: z.string().min(3),
   price: z.number().positive(),
   description: z.string().optional(),
@@ -16,6 +17,40 @@ const createProductSchema = z.object({
 });
 
 type CreateProductInput = z.infer<typeof createProductSchema>;
+
+// POST /products
+productRoutes.post('/', async (c) => {
+  const body: CreateProductInput = await c.req.json();
+  const validation = createProductSchema.safeParse(body);
+
+  if (!validation.success) {
+    return c.json(
+      { message: 'Invalid input', errors: validation.error },
+      400
+    );
+  }
+
+  // Jika `code` tidak diberikan, generate otomatis
+  const productCode = body.code || generateProductCode(body.name);
+
+  const productData = {
+    code: productCode, // Gunakan code yang sudah ada atau hasil generate
+    name: body.name,
+    price: body.price,
+    description: body.description || null,
+    imageUrl: body.imageUrl || null,
+    fanbase: body.fanbase || null,
+  };
+
+  try {
+    const product = await prisma.product.create({
+      data: productData,
+    });
+    return c.json(product, 201);
+  } catch (error) {
+    return c.json({ message: 'Error creating product', error }, 500);
+  }
+});
 
 // GET /products
 productRoutes.get('/', async (c) => {
@@ -33,33 +68,6 @@ productRoutes.get('/:code', async (c) => {
   }
 
   return c.json(product);
-});
-
-// POST /products
-productRoutes.post('/', async (c) => {
-  const body: CreateProductInput = await c.req.json();
-  const validation = createProductSchema.safeParse(body);
-
-  if (!validation.success) {
-    return c.json(
-      { message: 'Invalid input', errors: validation.error },
-      400,
-    );
-  }
-
-  const productData = {
-    code: body.code,
-    name: body.name,
-    price: body.price,
-    description: body.description || null, // Default null jika tidak diisi
-    imageUrl: body.imageUrl || null, // Default null jika tidak diisi
-    fanbase: body.fanbase || null, // Default null jika tidak diisi
-  };
-
-  const product = await prisma.product.create({
-    data: productData,
-  });
-  return c.json(product, 201);
 });
 
 export default productRoutes;
