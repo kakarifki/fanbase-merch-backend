@@ -98,4 +98,36 @@ orderRoutes.get('/:orderId', checkAuth, async (c) => {
   }
 });
 
+// GET /order - Get all orders for the logged-in user
+orderRoutes.get('/', checkAuth, async (c) => {
+  const user = c.get('user');
+  if (!user) {
+    return c.json({ message: 'Unauthorized' }, 401);
+  }
+
+  try {
+    const orders = await prisma.order.findMany({
+      where: {
+        userId: user.id,
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return c.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    return c.json({ message: 'Failed to fetch orders' }, 500);
+  }
+});
+
+
 export default orderRoutes;
